@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJ 音效混音台</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(45deg, #1a1a1a, #000000);
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .drum-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 30px;
+            background: rgba(51, 51, 51, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid #444;
+        }
+        
+        .drum-pad {
+            width: 120px;
+            height: 120px;
+            border: 3px solid #666;
+            border-radius: 15px;
+            background: linear-gradient(145deg, #4a4a4a, #333);
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .drum-pad::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .drum-pad:hover::before {
+            opacity: 1;
+        }
+        
+        .drum-pad:active {
+            background: linear-gradient(145deg, #333, #4a4a4a);
+            transform: scale(0.95) translateY(2px);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+        }
+
+        .drum-pad.active {
+            animation: glow 0.5s ease-in-out;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px #fff; }
+            50% { box-shadow: 0 0 20px #fff, 0 0 30px #ff00ff; }
+            100% { box-shadow: 0 0 5px #fff; }
+        }
+    </style>
+</head>
+<body>
+    <div class="drum-container">
+        <button class="drum-pad" data-key="1">怕</button>
+        <button class="drum-pad" data-key="2">？</button>
+        <button class="drum-pad" data-key="3">🇨🇳</button>
+        <button class="drum-pad" data-key="4">wego</button>
+        <button class="drum-pad" data-key="5">fall</button>
+        <button class="drum-pad" data-key="6">🎉</button>
+        <button class="drum-pad" data-key="7">蛤</button>
+        <button class="drum-pad" data-key="8">供啥</button>
+        <button class="drum-pad" data-key="9">大聲啥？</button>
+        <button class="drum-pad" data-key="0">ㄉㄨㄚˇ蝦？</button>
+        <button class="drum-pad" data-key="q">blow</button>
+        <button class="drum-pad" data-key="w">gay</button>
+    </div>
+
+    <script>
+        const drumPads = document.querySelectorAll('.drum-pad');
+        let currentSound = null;
+        
+        // 音效將在這裡添加
+        const sounds = {
+            '1': new Audio('vouge.mp3'),
+            '2': new Audio('AmongUs.mp3'),
+            '3': new Audio('china.mp3'),
+            '4': new Audio('MarioH.mp3'),
+            '5': new Audio('ThePriceisRight.mp3'),
+            '6': new Audio('PartyHorn.mp3'),
+            '7': new Audio('wsagihuh.mp3'),
+            '8': new Audio('talkaboutwhat.mp3'),
+            '9': new Audio('whyusoundsobig.mp3'),
+            '0': new Audio('whyusoundsobigT.mp3'),
+            'q': new Audio('blow.mp3'),
+            'w': new Audio('gay.mp3'),
+        };
+
+        // 初始化音效
+        Object.values(sounds).forEach(sound => {
+            sound.volume = 0.8;
+        });
+        
+        // 點擊事件
+        drumPads.forEach(pad => {
+            pad.addEventListener('click', () => {
+                const key = pad.getAttribute('data-key');
+                if (sounds[key]) {
+                    // 停止當前播放的音效
+                    if (currentSound) {
+                        currentSound.pause();
+                        currentSound.currentTime = 0;
+                    }
+                    // 播放新的音效
+                    currentSound = sounds[key];
+                    currentSound.currentTime = 0;
+                    currentSound.play();
+                    pad.style.animation = 'none';
+                    pad.offsetHeight; // 觸發重繪
+                    pad.style.animation = null;
+                    pad.classList.add('active');
+                    setTimeout(() => pad.classList.remove('active'), 500);
+                }
+            });
+        });
+
+        // 鍵盤事件
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            const pad = document.querySelector(`[data-key="${key}"]`);
+            if (pad && !e.repeat) {
+                pad.click();
+                pad.classList.add('active');
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            const pad = document.querySelector(`[data-key="${key}"]`);
+            if (pad) {
+                pad.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
